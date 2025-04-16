@@ -23,7 +23,7 @@
 
         .hero {
             height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('JokerCrazy.jpg') no-repeat center center/cover;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('fichas.jpg') no-repeat center center/cover;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -92,7 +92,7 @@
 
         @media (max-width: 900px) {
             .hero {
-                background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('JokerCrazy_mobile.jpg') no-repeat center center/cover;
+                background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('fichas_mobile.jpg') no-repeat center center/cover;
             }
             .cta-button {
                 font-size: 1.5em;
@@ -116,85 +116,80 @@
 
     <!-- Meta Pixel Code -->
     <script>
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '1721319675085704'); // Remplazar por pixel
-        fbq('track', 'PageView');
-    </script>
-    <noscript>
-        <img height="1" width="1" src="https://www.facebook.com/tr?id=1721319675085704&ev=PageView&noscript=1"/> //remplazar por pixel id
-    </noscript>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '...');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" src="https://www.facebook.com/tr?id=...&ev=PageView&noscript=1"/>
+  </noscript>
 
 <script>
-    // Variables de configuración
-    const accessToken = "EAAoe6urdLAYBOZCvZApV25wjtm8ZA742O085z009lXNsqBZCNqNqaXedyarKLyyKFXZCK7hRgQ9vDnfaDveGP3aZAita7ofLmpquZBlKZBFaNMHa66yZAsgD1ZCCBTG89gm4lzlczKlUuMFTZBIvRS3oCycrYUtKzFg636HZCu5LuIXGRXonURwZAh5bBmZByVvhmampvtigZDZD"; // Reemplázalo con tu token de acceso de la API de conversiones
-    const pixelId = "1721319675085704"; // Reemplázalo con tu Pixel ID de Meta
-    const conversionValue = 5.00;  // Ajusta el valor de la conversión
-    const currency = "ARS";  // Ajusta la moneda
+  const accessToken = "...";
+  const pixelId = "...";
+  const conversionValue = 1.00;
+  const currency = 'USD';
 
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
     const whatsappButton = document.querySelector('.cta-button');
 
     if (whatsappButton) {
-        whatsappButton.addEventListener('click', function () {
+      whatsappButton.addEventListener('click', function () {
+        const eventId = Math.random().toString(36).substring(2, 15); // 🔁 Crear ID único para ambos
 
-            const eventos = ["Comprar"];
-            const eventoSeleccionado = eventos[Math.floor(Math.random() * eventos.length)]; // Alterna entre los dos eventos
+        // Evento del píxel (cliente)
+        if (typeof fbq !== 'undefined') {
+          fbq('track', 'Purchase', {
+            content_name: 'Clic en botón WhatsApp',
+            content_category: 'Interacción',
+            value: conversionValue,
+            currency: currency,
+            eventID: eventId // ✅ Enviar el mismo ID
+          });
+        }
 
-            console.log(`Evento seleccionado: ${eventoSeleccionado}`);
-
-
-            fbq('track', eventoSeleccionado, { 
-                content_name: 'Clic en botón WhatsApp',
-                content_category: 'Interacción de usuario'
-            });
-
-            fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    data: [{
-                        event_name: eventoSeleccionado, 
-                        event_time: Math.floor(Date.now() / 1000),
-                        action_source: "website",
-                        event_source_url: window.location.href,
-                        event_id: Math.random().toString(36).substring(2, 15),
-                        user_data: {
-                            client_user_agent: navigator.userAgent
-                        },
-                        custom_data: {
-                            value: conversionValue,
-                            currency: currency
-                        }
-                    }],
-                    access_token: accessToken
-                })
-            })
-            .then(response => response.json())
-            .then(data => console.log("Respuesta API Conversiones:", data))
-            .catch(error => console.error("Error en API Conversiones:", error));
-        });
-    } else {
-        console.warn("No se encontró el botón de WhatsApp.");
+        // Evento vía API (servidor)
+        fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            data: [{
+              event_name: "Purchase",
+              event_time: Math.floor(Date.now() / 1000),
+              action_source: "website",
+              event_source_url: window.location.href,
+              event_id: eventId,
+              user_data: {
+                client_user_agent: navigator.userAgent
+              },
+              custom_data: {
+                value: conversionValue,
+                currency: currency
+              }
+            }],
+            access_token: accessToken
+          })
+        })
+        .then(res => res.json())
+        .then(data => console.log("API Conversiones:", data))
+        .catch(error => console.error("Error:", error));
+      });
     }
-});
-
+  });
 </script>
-
 </head>
 <body>
     <section class="hero">
         <h1>¡Jugá y Ganá con nosotros, estamos las 24h del día junto a vos!</h1>
         <p>Para crear tu cuenta, envíanos un WhatsApp haciendo click en el botón de abajo</p>
-        <a href="https://api.whatsapp.com/send?phone=5493416191861&text=¡Buenas!%20Me%20gustaría%20crear%20un%20usuario.%20Mi%20nombre%20es:" 
+        <a href="https://api.whatsapp.com/send?phone=549...&text=¡Buenas!%20Me%20gustaría%20crear%20un%20usuario.%20Mi%20nombre%20es:" 
            class="cta-button" target="_blank">
             <i class='fab fa-whatsapp'></i> ¡Crea tu usuario!
         </a>
