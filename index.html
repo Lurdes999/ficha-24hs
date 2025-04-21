@@ -132,66 +132,76 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '9639035139487833');
+    fbq('init', '1015363057206719);
     fbq('track', 'PageView');
   </script>
   <noscript>
-    <img height="1" width="1" src="https://www.facebook.com/tr?id=9639035139487833&ev=PageView&noscript=1"/>
+    <img height="1" width="1" src="https://www.facebook.com/tr?id=1015363057206719&ev=PageView&noscript=1"/>
   </noscript>
 
 <script>
-  const accessToken = "EAAP4TzZAGJ64BO4MVFvjVtjeyxwCklgpy4EZAQq3b1A6NJtZAPoo4zTwUwNmYuhNstXy5OTqr1xifmvoHZAgOZCpUxeqISyBROyz7FYZC2DoXiKXJ0htM98wuX0uSGuZCcpd8B7ZA6pbbn8BOU3DSNKkS5uyEt7lHdVV3yvXZAv92HgE4hoaVEogxADw19krgy6ewSgZDZD";
-  const pixelId = "9639035139487833";
-  const conversionValue = ;
-  const currency = 'ARS';
+  const accessToken = "EAAP4TzZAGJ64BOwpkBHa9J4r0Raj760z7RmTDqfj9kCcb1f6heUm7ZCRe7QvVK6pUgjrAMxzfzDfAGPY7Iq4HRJxgQ0IdB5jxZBhtOFNZBsw2ZA4MZBvOkGlpZCVWdBGMfsVzlnm3gPXeecfFJlSsczk0sycciZBwrv9DsnZBa9FW5dCszlkyJtJihe5uu4O8R9iaswZDZD";
+  const pixelId = "1015363057206719";
+  const conversionValue = 2000; // Valor de la conversión (ajusta según necesites)
+  const currency = "ARS"; // Moneda (ajusta según necesites)
 
-document.addEventListener("DOMContentLoaded", function () {
+ document.addEventListener("DOMContentLoaded", function () {
     const whatsappButton = document.querySelector('.cta-button');
 
     if (whatsappButton) {
-        whatsappButton.addEventListener('click', function () {
-            // Definir el evento dinámicamente
-            const eventos = ["Comprar"];
-            const eventoSeleccionado = eventos[Math.floor(Math.random() * eventos.length)]; // Alterna entre los dos eventos
+        whatsappButton.addEventListener('click', function (e) {
+            // Solo rastreamos el evento si no es para abrir en nueva pestaña (Ctrl+click)
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                // Evento a rastrear (solo "Comprar" como solicitaste)
+                const evento = "Purchase"; // Usamos "Purchase" que es el estándar para compras
+                
+                console.log(`Evento rastreado: ${evento}`);
 
-            console.log(`Evento seleccionado: ${eventoSeleccionado}`);
+                // Enviar evento a Facebook Pixel
+                fbq('track', evento, { 
+                    value: conversionValue,
+                    currency: currency,
+                    content_name: 'Creación de usuario',
+                    content_category: 'Registro'
+                });
 
-            // Enviar evento a Facebook Pixel
-            fbq('track', eventoSeleccionado, { 
-                content_name: 'Clic en botón WhatsApp',
-                content_category: 'Interacción de usuario'
-            });
-
-            // Enviar evento a la API de Conversiones de Facebook
-            fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    data: [{
-                        event_name: eventoSeleccionado, // Aquí cambia entre "Comprar" y "Cliente Potencial"
-                        event_time: Math.floor(Date.now() / 1000),
-                        action_source: "website",
-                        event_source_url: window.location.href,
-                        event_id: Math.random().toString(36).substring(2, 15),
-                        user_data: {
-                            client_user_agent: navigator.userAgent
-                        },
-                        custom_data: {
-                            value: conversionValue,
-                            currency: currency
-                        }
-                    }],
-                    access_token: accessToken
+                // Enviar evento a la API de Conversiones de Facebook
+                fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        data: [{
+                            event_name: evento,
+                            event_time: Math.floor(Date.now() / 1000),
+                            action_source: "website",
+                            event_source_url: window.location.href,
+                            event_id: generateEventId(),
+                            user_data: {
+                                client_user_agent: navigator.userAgent,
+                                // Agrega más datos si los tienes (como fbc, fbp)
+                            },
+                            custom_data: {
+                                value: conversionValue,
+                                currency: currency
+                            }
+                        }],
+                        access_token: accessToken
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => console.log("Respuesta API Conversiones:", data))
-            .catch(error => console.error("Error en API Conversiones:", error));
+                .then(response => response.json())
+                .then(data => console.log("Respuesta API Conversiones:", data))
+                .catch(error => console.error("Error en API Conversiones:", error));
+            }
         });
     } else {
         console.warn("No se encontró el botón de WhatsApp.");
+    }
+    
+    function generateEventId() {
+        return Math.random().toString(36).substring(2, 15) + 
+               Math.random().toString(36).substring(2, 15);
     }
 });
 </script>
