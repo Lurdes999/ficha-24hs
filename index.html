@@ -142,62 +142,65 @@
 <script>
   const accessToken = "EAAP4TzZAGJ64BO4MVFvjVtjeyxwCklgpy4EZAQq3b1A6NJtZAPoo4zTwUwNmYuhNstXy5OTqr1xifmvoHZAgOZCpUxeqISyBROyz7FYZC2DoXiKXJ0htM98wuX0uSGuZCcpd8B7ZA6pbbn8BOU3DSNKkS5uyEt7lHdVV3yvXZAv92HgE4hoaVEogxADw19krgy6ewSgZDZD";
   const pixelId = "9639035139487833";
-  const conversionValue = 1.00;
-  const currency = 'USD';
+  const conversionValue = ;
+  const currency = 'ARS';
 
-  document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
     const whatsappButton = document.querySelector('.cta-button');
 
     if (whatsappButton) {
-      whatsappButton.addEventListener('click', function () {
-        const eventId = Math.random().toString(36).substring(2, 15); // 🔁 Crear ID único para ambos
+        whatsappButton.addEventListener('click', function () {
+            // Definir el evento dinámicamente
+            const eventos = ["Comprar"];
+            const eventoSeleccionado = eventos[Math.floor(Math.random() * eventos.length)]; // Alterna entre los dos eventos
 
-        // Evento del píxel (cliente)
-        if (typeof fbq !== 'undefined') {
-          fbq('track', 'Purchase', {
-            content_name: 'Clic en botón WhatsApp',
-            content_category: 'Interacción',
-            value: conversionValue,
-            currency: currency,
-            eventID: eventId // ✅ Enviar el mismo ID
-          });
-        }
+            console.log(`Evento seleccionado: ${eventoSeleccionado}`);
 
-        // Evento vía API (servidor)
-        fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            data: [{
-              event_name: "Purchase",
-              event_time: Math.floor(Date.now() / 1000),
-              action_source: "website",
-              event_source_url: window.location.href,
-              event_id: eventId,
-              user_data: {
-                client_user_agent: navigator.userAgent
-              },
-              custom_data: {
-                value: conversionValue,
-                currency: currency
-              }
-            }],
-            access_token: accessToken
-          })
-        })
-        .then(res => res.json())
-        .then(data => console.log("API Conversiones:", data))
-        .catch(error => console.error("Error:", error));
-      });
+            // Enviar evento a Facebook Pixel
+            fbq('track', eventoSeleccionado, { 
+                content_name: 'Clic en botón WhatsApp',
+                content_category: 'Interacción de usuario'
+            });
+
+            // Enviar evento a la API de Conversiones de Facebook
+            fetch(`https://graph.facebook.com/v18.0/${pixelId}/events`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    data: [{
+                        event_name: eventoSeleccionado, // Aquí cambia entre "Comprar" y "Cliente Potencial"
+                        event_time: Math.floor(Date.now() / 1000),
+                        action_source: "website",
+                        event_source_url: window.location.href,
+                        event_id: Math.random().toString(36).substring(2, 15),
+                        user_data: {
+                            client_user_agent: navigator.userAgent
+                        },
+                        custom_data: {
+                            value: conversionValue,
+                            currency: currency
+                        }
+                    }],
+                    access_token: accessToken
+                })
+            })
+            .then(response => response.json())
+            .then(data => console.log("Respuesta API Conversiones:", data))
+            .catch(error => console.error("Error en API Conversiones:", error));
+        });
+    } else {
+        console.warn("No se encontró el botón de WhatsApp.");
     }
-  });
+});
 </script>
 </head>
 <body>
     <section class="hero">
         <h1>¡Sin Límites De Pago!</h1>
         <p>¡A un click de tu próximo Gran Premio!</p>
-        <a href="https://api.whatsapp.com/send?phone=549...&text=¡Buenas!%20Me%20gustaría%20crear%20un%20usuario.%20Mi%20nombre%20es:" 
+        <a href="https://api.whatsapp.com/send?phone=5491124966226&text=¡Buenas!%20Me%20gustaría%20crear%20un%20usuario.%20Mi%20nombre%20es:" 
            class="cta-button" target="_blank">
             <i class='fab fa-whatsapp'></i> ¡Crea tu usuario!
         </a>
